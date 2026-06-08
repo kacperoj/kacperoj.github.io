@@ -3,7 +3,7 @@
 title: Projekt Wypożyczalnia Samochodów
 ---
 
-# 🚗 ProjektWypozyczalnia2
+# Projekt Wypożyczalnia Samochodów
 
 Projekt bazy danych dla systemu wypożyczalni samochodów, zrealizowany w ramach przedmiotu **Programowanie Serwerów Baz Danych**.
 
@@ -11,11 +11,11 @@ Projekt bazy danych dla systemu wypożyczalni samochodów, zrealizowany w ramach
 |---|---|
 | **Baza danych** | Microsoft SQL Server |
 | **Narzędzie** | SSMS (SQL Server Management Studio) |
-| **Autorzy** | Kacper [nick] · Tymon Korpiela |
+| **Autorzy** | Kacper Papuga · Tymon Korpiela |
 
 ---
 
-## 📋 Spis treści
+## Spis treści
 
 - [Opis projektu](#opis-projektu)
 - [Diagram ERD](#diagram-erd)
@@ -53,17 +53,41 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 
 ## Diagram ERD
 
-<!-- Wklej tutaj obrazek diagramu ERD -->
-<!-- Przykład: ![Diagram ERD](docs/erd.png) -->
-
 > ![Diagram ERD](images/Diagram%20erd.drawio.png)
 
 ---
 
-## Architectural Overview
+## Szczegółowy opis tabel
 
-<!-- Wklej tutaj obrazek Architectural Overview Diagram -->
-<!-- Przykład: ![Architectural Overview](docs/architecture.png) -->
+Encje
+1.	Wypożyczenia - wypozyczenie_id, klient_id, pojazd_id, pracownik_id, data_wypozyczenia, data_planowanego_zwrotu, data_rzeczywistego_zwrotu, kwota_calkowita
+2.	Rezerwacje- rezerwacja_id, klient_id, pojazd_id, data_od, data_do, status, data_utworzenia
+3.	Płatności - platnosc_id, wypozyczenie_id, kwota, data_platnosci, metoda_platnosci
+4.	Klienci - klient_id, imie, nazwisko, pesel, telefon, email, adres, prywatny
+5.	Uszkodzenia - uszkodzenie_id, wypozyczenie_id, opis, koszt, data_zgloszenia
+6.	Ubezpieczenie wypożyczenia - ubezpieczenie_id, wypozyczenie_id, typ_ubezpieczenia, koszt, suma_gwarancyjna, warunki
+7.	Pracownicy - pracownik_id, imie, nazwisko, telefon, email, stanowisko
+8.	Premie pracowników - premia_id, pracownik_id, miesiac, kwota, opis
+9.	Pojazdy - pojazd_id, nr_rejestracyjny, nr_vin, marka, model, rok_produkcji, przebieg, typ_nadwozia, cena_za_dzien, status, data_dodania
+
+
+Funkcje
+1.	Dodawanie nowych pojazdów do floty 
+2.	Dodawanie nowych klientów
+3.	Weryfikacja danych klientów
+4.	Rozróżnienie klientów prywatnych i firmowych.
+5.	Tworzenie rezerwacji pojazdów na podstawie wymagań klienta
+6.	Przypisanie pracownika obsługującego.
+7.	Rejestracja rzeczywistej daty zwrotu.
+8.	Obsługa płatności – rejestrowanie płatności, obsługa różnych metod płatności
+9.	Rejestrowanie uszkodzeń pojazdów powstałych podczas wypożyczenia
+10.	Naliczanie premii za obsługę klientów.
+11.	Obsługa ubezpieczeń usługi wypożyczenia pojazdu
+12.	Raportowanie – najczęściej wypożyczane pojazdy, koszty usługi, skuteczność pracowników
+
+---
+
+## Diagram przypadków użycia
 
 > ![Diagram przypdaków użycia](images/UseCase1%201.jpg)
 
