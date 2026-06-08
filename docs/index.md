@@ -56,7 +56,7 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 <!-- Wklej tutaj obrazek diagramu ERD -->
 <!-- Przykład: ![Diagram ERD](docs/erd.png) -->
 
-> ![Diagram ERD](../05_opisy_i_diagramy/Diagram%20erd.drawio.png)
+> ![Diagram ERD](images/Diagram%20erd.drawio.png)
 
 ---
 
@@ -65,7 +65,7 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 <!-- Wklej tutaj obrazek Architectural Overview Diagram -->
 <!-- Przykład: ![Architectural Overview](docs/architecture.png) -->
 
-> 📌 ![Diagram przypdaków użycia](../05_opisy_i_diagramy/UseCase1%201.jpg)
+> 📌 ![Diagram przypdaków użycia](images/UseCase1%201.jpg)
 
 ---
 
