@@ -65,7 +65,7 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 <!-- Wklej tutaj obrazek Architectural Overview Diagram -->
 <!-- Przykład: ![Architectural Overview](docs/architecture.png) -->
 
-> 📌 ![Diagram przypdaków użycia](images/UseCase1%201.jpg)
+> ![Diagram przypdaków użycia](images/UseCase1%201.jpg)
 
 ---
 
