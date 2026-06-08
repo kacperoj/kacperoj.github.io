@@ -1,8 +1,3 @@
-
----
-title: Projekt Wypożyczalnia Samochodów
----
-
 # Projekt Wypożyczalnia Samochodów
 
 Projekt bazy danych dla systemu wypożyczalni samochodów, zrealizowany w ramach przedmiotu **Programowanie Serwerów Baz Danych**.
@@ -95,7 +90,7 @@ Funkcje
 
 ## Struktura bazy danych
 
-Plik: [`01_struktura/create_tables.sql`](01_struktura/create_tables.sql)
+Plik: [`01_struktura/Create_bazy.sql`](../01_struktura/Create_bazdy.sql)
 
 Skrypt tworzy bazę danych `ProjektWypozyczalnia2` oraz wszystkie tabele z:
 - kluczami głównymi (`IDENTITY`) i obcymi (`FOREIGN KEY`)
@@ -106,7 +101,7 @@ Skrypt tworzy bazę danych `ProjektWypozyczalnia2` oraz wszystkie tabele z:
 
 ## Generowanie danych
 
-Pliki: [`02_dane/GenerujDaneProjekt_FINAL.sql`](02_dane/GenerujDaneProjekt_FINAL.sql) · [`02_dane/CzyszczenieBazy.sql`](02_dane/CzyszczenieBazy.sql)
+Pliki: [`02_dane/Generuj_dane_Projektu_FINAL.sql`](../02_dane/Generuj_dane_Projektu_FINAL.sql) · [`02_dane/CzyszczenieBazy.sql`](../02_dane/CzyszczenieBazy.sql)
 
 Jeden skrypt generuje dane do wszystkich tabel w kolejności zgodnej z kluczami obcymi:
 
@@ -128,7 +123,7 @@ Skrypt `CzyszczenieBazy.sql` usuwa wszystkie rekordy i resetuje liczniki `IDENTI
 
 ## Triggery
 
-Plik: [`03_triggery/Triggery.sql`](03_triggery/Triggery.sql)
+Plik: [`03_obiekty_bazy_danych/Triggery.sql`](../03_obiekty_bazy_danych/Triggery.sql)
 
 Zaimplementowano 12 triggerów w 4 kategoriach:
 
@@ -170,12 +165,69 @@ Zaimplementowano 12 triggerów w 4 kategoriach:
 | `trg_Klienci_Archive_Delete` | `klienci` | `AFTER DELETE` | Przenosi usuniętego klienta do tabeli `ArchiwumKlienci` |
 
 ---
+### Widoki
+
+Plik: [`03_obiekty_bazy_danych/widoki.sql`](../03_obiekty_bazy_danych/widoki.sql)
+
+Zaimplementowano 8 widoków zapewniających gotowe perspektywy analityczne i operacyjne:
+
+| Widok | Opis |
+|-------|------|
+| `vw_SzczegolyWypozyczen` | Pełne informacje o każdym wypożyczeniu — klient, pojazd, pracownik, daty i kwota w jednym widoku |
+| `vw_HistoriaKlientow` | Historia aktywności każdego klienta — liczba wypożyczeń, łączna wartość, data ostatniego wypożyczenia |
+| `vw_NajlepsiKlienci` | Ranking klientów wg liczby wypożyczeń i łącznej kwoty |
+| `vw_NajbardziejEfektywnyPracownik` | TOP 3 pracowników wg liczby obsłużonych wypożyczeń |
+| `vw_NajchetniejWybieranyTypNadwoazia` | Najczęściej wypożyczany typ nadwozia |
+| `vw_PojazdyDoKontroli` | Pojazdy wymagające przeglądu — przebieg ≥ 200 000 km lub status `serwis` |
+| `vw_MiesiecznePrzychody` | Miesięczne przychody z płatności — liczba transakcji i suma wpływów per miesiąc |
+| `vw_UszkodzeniaWypozyczen` | Zestawienie uszkodzeń per wypożyczenie — liczba szkód i łączny koszt napraw |
+
+---
+
+### Funkcje
+
+Plik: [`03_obiekty_bazy_danych/Funkcje.sql`](../03_obiekty_bazy_danych/Funkcje.sql)
+
+Zaimplementowano 6 funkcji użytkownika — 1 tabelaryczną (TVF) i 5 skalarnych:
+
+#### Funkcja tabelaryczna (inline TVF)
+
+| Funkcja | Opis |
+|---------|------|
+| `dbo.AktywneWypozyczenia()` | Zwraca tabelę wszystkich aktywnych wypożyczeń (bez daty rzeczywistego zwrotu) wraz z danymi klienta i pojazdu |
+
+```sql
+SELECT * FROM dbo.AktywneWypozyczenia();
+```
+
+#### Funkcje skalarne
+
+| Funkcja | Parametry | Zwraca | Opis |
+|---------|-----------|--------|------|
+| `dbo.LiczbaDniWypozyczenia` | `@dataOd`, `@dataDo` | `INT` | Liczba dni trwania wypożyczenia (włącznie z dniem zwrotu) |
+| `dbo.KosztWypozyczenia` | `@pojazd_id`, `@dataOd`, `@dataDo` | `DECIMAL(10,2)` | Całkowity koszt wypożyczenia dla danego pojazdu i okresu |
+| `dbo.CzyStalyKlient` | `@klient_id` | `VARCHAR(20)` | Zwraca `'Stały klient'` dla klientów z ≥ 5 wypożyczeniami, w przeciwnym razie `'Niestały klient'` |
+| `dbo.ObliczKareZaSpoznienie` | `@dataPlanowanegoZwrotu`, `@dataRzeczywistegoZwrotu`, `@karaZaDzien` | `DECIMAL(10,2)` | Wysokość kary za spóźniony zwrot — 0 jeśli zwrot był na czas |
+| `dbo.WartoscKlienta` | `@klient_id` | `DECIMAL(12,2)` | Łączna wartość wszystkich wypożyczeń danego klienta |
+
+Przykłady użycia:
+
+```sql
+-- Koszt wypożyczenia pojazdu nr 1 na 7 dni
+SELECT dbo.KosztWypozyczenia(1, '2024-01-01', '2024-01-07');
+
+-- Sprawdzenie czy klient jest stałym klientem
+SELECT dbo.CzyStalyKlient(5);
+
+-- Kara za 3 dni spóźnienia przy stawce 50 zł/dzień
+SELECT dbo.ObliczKareZaSpoznienie('2024-01-10', '2024-01-13', 50.00);
+```
+
+---
 
 ## Transakcje
 
-Plik: [`04_transakcje/Transakcje.sql`](04_transakcje/Transakcje.sql)
-
-*Autor: Tymon Korpiela*
+Plik: [`04_zapytania/tranzakcje.sql`](../04_zapytania/tranzakcje.sql)
 
 Zaimplementowano kilka scenariuszy transakcyjnych demonstrujących mechanizmy kontroli spójności danych:
 
@@ -205,7 +257,7 @@ EXEC dbo.DodajPojazdTestowy @akcja = 'ROLLBACK'; -- wycofuje
 
 ## Zapytania zaawansowane
 
-Plik: [`05_zapytania/ZaawansowaneZapytania.sql`](05_zapytania/ZaawansowaneZapytania.sql)
+Plik: [`04_zapytania/ZaawansowaneZapytania.sql`](../04_zapytania/ZaawansowaneZapytania.sql)
 
 15 zapytań w 3 kategoriach:
 
@@ -232,7 +284,7 @@ Plik: [`05_zapytania/ZaawansowaneZapytania.sql`](05_zapytania/ZaawansowaneZapyta
 
 ## Funkcje okna
 
-Plik: [`05_zapytania/FunkcjeOkna.sql`](05_zapytania/FunkcjeOkna.sql)
+Plik: [`04_zapytania/FunkcjeOkna.sql`](../04_zapytania/FunkcjeOkna.sql)
 
 14 zapytań w 4 kategoriach:
 
@@ -260,9 +312,7 @@ Plik: [`05_zapytania/FunkcjeOkna.sql`](05_zapytania/FunkcjeOkna.sql)
 
 ## Raportowanie XML i JSON
 
-Plik: [`06_raporty/RaportyXML_JSON.sql`](06_raporty/RaportyXML_JSON.sql)
-
-*Autor: Tymon Korpiela*
+Plik: [`04_zapytania/RaportyXML_JSON.sql`](../04_zapytania/RaportyXML_JSON.sql)
 
 ### Raporty XML
 
