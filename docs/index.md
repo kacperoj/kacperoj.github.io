@@ -67,10 +67,8 @@ Skrypt łączący w jednym pliku wszystkie elementy projektu opisane szczegóło
 
 > ![Architecture Overview](images/SQL%20Server%20Database-2026-06-09-120054.png)
 
-<!-- Wklej link do diagramu tutaj: -->
-<!-- ![Architecture Overview](images/NAZWA_PLIKU.png) -->
 
-> 📌 *Architecture Overview Diagram zostanie tutaj umieszczony*
+
 
 ---
 
