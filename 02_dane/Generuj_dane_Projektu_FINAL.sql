@@ -1,4 +1,4 @@
-CREATE Database ProjektWypozyczalnia2
+CREATE Database ProjektWypo
 
 CREATE TABLE pojazdy (
 pojazd_id int IDENTITY(1,1) NOT NULL PRIMARY KEY,

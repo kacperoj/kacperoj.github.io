@@ -1,22 +1,20 @@
--- ============================================================
+
 -- 1. BAZA DANYCH
--- ============================================================
-IF DB_ID('ProjektWypoTest') IS NOT NULL
+IF DB_ID('ProjektWypo') IS NOT NULL
 BEGIN
-    ALTER DATABASE ProjektWypoTest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-    DROP DATABASE ProjektWypoTest;
+    ALTER DATABASE ProjektWypo SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE ProjektWypo;
 END
 GO
 
-CREATE DATABASE ProjektWypoTest;
+CREATE DATABASE ProjektWypo;
 GO
 
-USE ProjektWypoTest;
+USE ProjektWypo;
 GO
 
--- ============================================================
+
 -- 2. TABELE GLOWNE
--- ============================================================
 
 CREATE TABLE pojazdy (
     pojazd_id    INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -118,9 +116,8 @@ CREATE TABLE Ubezpieczenie_wypozyczenia (
 );
 GO
 
--- ============================================================
+
 -- 3. TABELE POMOCNICZE (audyt, archiwum, historia)
--- ============================================================
 
 CREATE TABLE dbo.KlientAudit (
     AuditID    INT IDENTITY PRIMARY KEY,
@@ -179,9 +176,8 @@ CREATE TABLE dbo.WypozyczalniaDDLAudit (
 );
 GO
 
--- ============================================================
+
 -- 4. FUNKCJE UZYTKOWNIKA
--- ============================================================
 
 -- [F1] Aktywne wypozyczenia (inline TVF)
 CREATE FUNCTION dbo.AktywneWypozyczenia()
@@ -251,9 +247,8 @@ BEGIN
 END
 GO
 
--- ============================================================
+
 -- 5. WIDOKI
--- ============================================================
 
 CREATE VIEW vw_SzczegolyWypozyczen AS
 SELECT w.wypozyczenie_id,
@@ -338,9 +333,8 @@ LEFT JOIN uszkodzenia u ON w.wypozyczenie_id = u.wypozyczenie_id
 GROUP BY w.wypozyczenie_id, k.imie, k.nazwisko, p.marka, p.model;
 GO
 
--- ============================================================
+
 -- 6. TRIGGERY
--- ============================================================
 
 -- [T1] Audyt zmian danych klienta
 CREATE OR ALTER TRIGGER trg_KlientDaneAudit ON dbo.klienci AFTER UPDATE AS
@@ -498,9 +492,8 @@ BEGIN
 END;
 GO
 
--- ============================================================
+
 -- 7. PROCEDURY GENERUJACE DANE
--- ============================================================
 
 CREATE OR ALTER PROCEDURE dbo.Gen_Pojazdy @n INT AS
 BEGIN
@@ -807,9 +800,8 @@ BEGIN
 END;
 GO
 
--- ============================================================
+
 -- 8. WYPELNIENIE DANYCH
--- ============================================================
 EXEC dbo.Gen_Pojazdy      300;
 EXEC dbo.Gen_Klienci      200;
 EXEC dbo.Gen_Pracownicy    50;
@@ -821,9 +813,8 @@ EXEC dbo.Gen_Premie       150;
 EXEC dbo.Gen_Ubezpieczenia;
 GO
 
--- ============================================================
+
 -- PODSUMOWANIE
--- ============================================================
 SELECT 'pojazdy'                     AS tabela, COUNT(*) AS rekordy FROM pojazdy                    UNION ALL
 SELECT 'klienci',                               COUNT(*)            FROM klienci                    UNION ALL
 SELECT 'pracownicy',                            COUNT(*)            FROM pracownicy                 UNION ALL

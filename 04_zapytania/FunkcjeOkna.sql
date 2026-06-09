@@ -1,17 +1,11 @@
--- ============================================================
---  FUNKCJE OKNA (OVER/PARTITION BY) - Wypozyczalnia Samochodow
--- ============================================================
+
 USE ProjektWypo;
 GO
 
--- ============================================================
 -- CZESC 1: FUNKCJE RANKINGOWE
--- (RANK, DENSE_RANK, ROW_NUMBER, NTILE)
--- ============================================================
+
 
 -- [1] Ranking klientow wg lacznej wartosci wypozyczen
---     RANK()       - ta sama pozycja przy remisie, potem przerwa (1,2,2,4)
---     DENSE_RANK() - ta sama pozycja przy remisie, bez przerwy  (1,2,2,3)
 SELECT
     k.klient_id,
     k.imie + ' ' + k.nazwisko             AS Klient,
@@ -26,7 +20,6 @@ ORDER BY Ranking;
 GO
 
 -- [2] Ranking klientow generujacych najwiecej uszkodzen
---     Dwa rownolegle rankingi w jednym zapytaniu: wg liczby i wg kosztu
 SELECT
     k.klient_id,
     k.imie + ' ' + k.nazwisko             AS Klient,
@@ -42,7 +35,6 @@ ORDER BY RankingUszkodzen;
 GO
 
 -- [3] Numerowanie wypozyczen kazdego klienta chronologicznie (ROW_NUMBER)
---     ROW_NUMBER zawsze daje unikalne numery nawet przy identycznych datach
 SELECT
     k.imie + ' ' + k.nazwisko             AS Klient,
     w.wypozyczenie_id,
@@ -58,7 +50,6 @@ ORDER BY k.klient_id, NrWypozyczenia;
 GO
 
 -- [4] Podzial pojazdow na 4 grupy cenowe z etykieta (NTILE)
---     Grupa 1 = najdrozsze, Grupa 4 = najtansze
 SELECT
     pojazd_id,
     marka + ' ' + model                    AS Pojazd,
@@ -76,7 +67,6 @@ ORDER BY cenaZaDzien DESC;
 GO
 
 -- [5] Podzial wypozyczen na 4 grupy wg wartosci (NTILE)
---     Segmentacja transakcji bez sztywnych progow kwotowych
 SELECT
     w.wypozyczenie_id,
     k.imie + ' ' + k.nazwisko             AS Klient,
@@ -94,13 +84,10 @@ ORDER BY w.kwotaCalkowita DESC;
 GO
 
 
--- ============================================================
+
 -- CZESC 2: FUNKCJE PRZESUNIECIA
--- (LAG, LEAD, FIRST_VALUE, LAST_VALUE)
--- ============================================================
 
 -- [6] Odstep miedzy kolejnymi wypozyczeniami klienta (LAG)
---     NULL w PoprzednieWypozyczenie = pierwsze wypozyczenie klienta
 SELECT
     k.imie + ' ' + k.nazwisko             AS Klient,
     w.wypozyczenie_id,
@@ -122,7 +109,6 @@ ORDER BY k.klient_id, w.dataWypozyczenia;
 GO
 
 -- [7] Porownanie biezacego wypozyczenia z nastepnym (LEAD)
---     LEAD patrzy w przyszlosc - kiedy klient wypozyczyl auto ponownie
 SELECT
     k.imie + ' ' + k.nazwisko             AS Klient,
     w.wypozyczenie_id,
@@ -142,8 +128,6 @@ ORDER BY k.klient_id, w.dataWypozyczenia;
 GO
 
 -- [8] Pierwsze i ostatnie wypozyczenie kazdego klienta (FIRST_VALUE / LAST_VALUE)
---     LAST_VALUE wymaga ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
---     bez tego klauzula domyslna zatrzymuje sie na biezacym wierszu
 SELECT DISTINCT
     k.imie + ' ' + k.nazwisko             AS Klient,
     FIRST_VALUE(w.dataWypozyczenia) OVER (
@@ -165,13 +149,11 @@ ORDER BY LacznaLiczbaWypozyczen DESC;
 GO
 
 
--- ============================================================
+
 -- CZESC 3: FUNKCJE AGREGUJACE W OKNIE
--- (SUM/AVG/COUNT OVER, narastajace sumy, srednie kroczace)
--- ============================================================
 
 -- [9] Narastajacy przychod miesiac po miesiacu (running total)
---     ROWS UNBOUNDED PRECEDING - sumuje od pierwszego wiersza do biezacego
+
 SELECT
     Rok, Miesiac,
     Przychod,
@@ -197,7 +179,6 @@ ORDER BY Rok, Miesiac;
 GO
 
 -- [10] Srednia kroczaca ceny za dobe (okno 3 wypozyczen wstecz)
---      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW = okno 3-wierszowe
 SELECT
     p.marka + ' ' + p.model               AS Pojazd,
     w.dataWypozyczenia,
@@ -213,7 +194,6 @@ ORDER BY p.pojazd_id, w.dataWypozyczenia;
 GO
 
 -- [11] Udzial procentowy kazdego pracownika w przychodzie calkowitym
---      SUM() OVER () bez PARTITION BY liczy sume globalnie po wszystkich wierszach
 SELECT
     pr.imie + ' ' + pr.nazwisko           AS Pracownik,
     pr.stanowisko,
@@ -230,8 +210,6 @@ ORDER BY PrzychodPracownika DESC;
 GO
 
 -- [12] Sredni przebieg w podziale na typ nadwozia z odchyleniem
---      AVG() OVER (PARTITION BY) zachowuje kazdy wiersz (brak GROUP BY)
---      dzieki czemu widac odchylenie konkretnego pojazdu od sredniej grupy
 SELECT
     pojazd_id,
     marka + ' ' + model                    AS Pojazd,
@@ -248,14 +226,10 @@ ORDER BY typNadwozia, przebieg DESC;
 GO
 
 
--- ============================================================
+
 -- CZESC 4: FUNKCJE DYSTRYBUCJI
--- (CUME_DIST, PERCENT_RANK)
--- ============================================================
 
 -- [13] Pozycja kwoty wypozyczenia w rozkladzie klienta
---      CUME_DIST  - procent wypozyczen klienta z kwota <= biezacej (0..1]
---      PERCENT_RANK - relatywna pozycja (0 = najnizszy, 1 = najwyzszy)
 SELECT
     k.imie + ' ' + k.nazwisko             AS Klient,
     w.wypozyczenie_id,
@@ -274,7 +248,6 @@ ORDER BY k.klient_id, w.kwotaCalkowita;
 GO
 
 -- [14] Percentyl cenowy pojazdow w obrebie marki
---      Pokazuje na tle ktorego percentyla cen danej marki lezy dany pojazd
 SELECT
     marka,
     model,

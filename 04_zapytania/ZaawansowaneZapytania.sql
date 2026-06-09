@@ -1,12 +1,8 @@
--- ============================================================
---  ZAAWANSOWANE ZAPYTANIA - Wypozyczalnia Samochodow
--- ============================================================
 USE ProjektWypo;
 GO
 
--- ============================================================
+
 -- CZESC 1: ZAPYTANIA AGREGUJACE
--- ============================================================
 
 -- [1] Liczba wypozyczen obsluzona przez kazdego pracownika
 SELECT
@@ -22,7 +18,6 @@ ORDER BY LiczbaWypozyczen DESC;
 GO
 
 -- [2] Wartosc ubezpieczen wg typu nadwozia i konkretnego pojazdu (ROLLUP)
---     Wiersze z NULL to sumy czesciowe generowane przez ROLLUP
 SELECT
     ISNULL(p.typNadwozia,              'SUMA WSZYSTKICH') AS TypNadwozia,
     ISNULL(p.marka + ' ' + p.model,   'Suma dla typu')   AS Pojazd,
@@ -60,7 +55,6 @@ ORDER BY LacznyPrzychod DESC;
 GO
 
 -- [5] Przychod na pracownika z podsuma globalna (GROUPING SETS)
---     Wiersz z NULL to suma globalna wszystkich pracownikow
 SELECT
     pr.pracownik_id,
     pr.imie + ' ' + pr.nazwisko        AS Pracownik,
@@ -105,12 +99,10 @@ ORDER BY Kwartal, DATEPART(WEEKDAY, dataWypozyczenia);
 GO
 
 
--- ============================================================
+
 -- CZESC 2: CTE (Common Table Expressions)
--- ============================================================
 
 -- [8] TOP 3 klientow wg przychodu w kazdym miesiacu
---     Dwupoziomowe CTE: najpierw agregacja, potem ranking
 WITH PrzychodKlientow AS (
     SELECT
         YEAR(w.dataWypozyczenia)       AS Rok,
@@ -175,9 +167,9 @@ ORDER BY p.pojazd_id, nw.NrWypozyczenia;
 GO
 
 
--- ============================================================
+
 -- CZESC 3: WYKRYWANIE ANOMALII I RAPORTY OPERACYJNE
--- ============================================================
+
 
 -- [11] Wypozyczenia przeterminowane (nie zwrocone po planowanej dacie)
 SELECT

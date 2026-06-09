@@ -1,8 +1,3 @@
--- ============================================================
---  CZYSZCZENIE WSZYSTKICH TABEL - Wypozyczalnia Samochodow
---  Uzywa DELETE (dziala zawsze, niezaleznie od FK)
---  Kolejnosc: dzieci przed rodzicami
--- ============================================================
 USE ProjektWypo;
 GO
 	

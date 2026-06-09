@@ -1,20 +1,9 @@
--- ============================================================
---  TRIGGERY - Wypozyczalnia Samochodow
---  Uruchom calosciowo jednym F5
---
---  Zawiera:
---    TABELE POMOCNICZE (audyt / archiwum / historia)
---    TRIGGERY DML na tabelach
---    TRIGGER DDL na bazie danych
---    TESTY kazdego triggera
--- ============================================================
+
 USE ProjektWypo;
 GO
 
--- ============================================================
--- CZESC 1: TABELE POMOCNICZE
--- ============================================================
 
+-- CZESC 1: TABELE POMOCNICZE
 -- Audyt zmian danych osobowych klientow
 IF OBJECT_ID('dbo.KlientAudit','U') IS NULL
 CREATE TABLE dbo.KlientAudit (
@@ -84,18 +73,8 @@ CREATE TABLE dbo.WypozyczalniaDDLAudit (
 );
 GO
 
--- ============================================================
--- CZESC 2: TRIGGERY
--- ============================================================
 
--- ------------------------------------------------------------
--- [1] AFTER UPDATE na klienci
---     Cel: rejestruje w tabeli audytu kazda zmiane danych
---     klienta, wskazujac ktore kolumny (imie, nazwisko, pesel,
---     email) zostaly zmodyfikowane.
---     Uzycie COLUMNS_UPDATED() pozwala wykryc konkretne
---     kolumny zamiast logowac kazda zmiane bez wyjatku.
--- ------------------------------------------------------------
+-- CZESC 2: TRIGGERY
 CREATE OR ALTER TRIGGER trg_KlientDaneAudit
 ON dbo.klienci
 AFTER UPDATE
@@ -106,8 +85,6 @@ BEGIN
 
     DECLARE @opis NVARCHAR(200) = '';
 
-    -- Kolumna 1 = imie, 2 = nazwisko, 3 = pesel, 5 = email
-    -- (numeracja wg kolejnosci w CREATE TABLE)
     IF UPDATE(imie)     SET @opis += 'imie; ';
     IF UPDATE(nazwisko) SET @opis += 'nazwisko; ';
     IF UPDATE(pesel)    SET @opis += 'pesel; ';
@@ -122,12 +99,6 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [2] AFTER UPDATE na pracownicy
---     Cel: analogiczny do triggera na klientach - rejestruje
---     zmiany danych pracownika (imie, nazwisko, stanowisko,
---     email). Przydatne przy audycie HR i kontroli uprawnien.
--- ------------------------------------------------------------
 CREATE OR ALTER TRIGGER trg_PracownikAudit
 ON dbo.pracownicy
 AFTER UPDATE
@@ -150,15 +121,6 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [3] AFTER UPDATE na pojazdy (przebieg)
---     Cel: zapobiega cofaniu licznika przebiegu (np. blad
---     operatora lub proba fabrykowania danych). Jezeli nowa
---     wartosc jest nizsza od poprzedniej, trigger przywraca
---     stara wartosc.
---     TRIGGER_NESTLEVEL() > 1 chroni przed petla rekurencyjna
---     ktora powstalaby gdy ten sam trigger wywoluje siebie.
--- ------------------------------------------------------------
 CREATE OR ALTER TRIGGER trg_PojazdPrzebiegKorekta
 ON dbo.pojazdy
 AFTER UPDATE
@@ -177,12 +139,6 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [4] AFTER UPDATE na pojazdy (cena)
---     Cel: rejestruje kazda zmiane ceny za dobe wraz z osoba
---     ktora jej dokonala. Umozliwia analize polityki cenowej
---     i wykrycie nieprawidlowych zmian cen.
--- ------------------------------------------------------------
 CREATE OR ALTER TRIGGER trg_loguj_zmiane_ceny
 ON dbo.pojazdy
 AFTER UPDATE
@@ -204,13 +160,6 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [5] AFTER UPDATE na pojazdy (VIN)
---     Cel: numer VIN jest unikalnym identyfikatorem pojazdu
---     nadawanym przez producenta i nie moze byc zmieniany
---     po rejestracji w systemie. Trigger blokuje kazda probe
---     modyfikacji tego pola.
--- ------------------------------------------------------------
 CREATE OR ALTER TRIGGER trg_BlockVINChange
 ON dbo.pojazdy
 AFTER UPDATE
@@ -222,17 +171,7 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [6] INSTEAD OF INSERT na pojazdy
---     Cel: walidacja roku produkcji przed dodaniem pojazdu.
---     Wypozyczalnia nie przyjmuje aut starszych niz 2000 rok
---     (polityka floty). INSTEAD OF pozwala odrzucic caly
---     INSERT zanim rekord trafi do tabeli, bez koniecznosci
---     pozniejszego cofania transakcji.
---     UWAGA: kolumny opcjonalne (data_dodania, typNadwozia,
---     przebieg) sa przekazywane z inserted, dzieki czemu
---     trigger nie zaburza normalnego wstawiania rekordow.
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_PojazdInsertValidation
 ON dbo.pojazdy
 INSTEAD OF INSERT
@@ -254,15 +193,6 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [7] INSTEAD OF INSERT na platnosci
---     Cel: dwuetapowa walidacja przed zapisem platnosci:
---     (a) kwota musi byc dodatnia,
---     (b) powiazane wypozyczenie musi istniec w bazie.
---     INSTEAD OF gwarantuje ze nieprawidlowe dane nigdy nie
---     trafia do tabeli, w odroznieniu od AFTER ktory musi
---     cofac transakcje juz po bledzie.
--- ------------------------------------------------------------
 CREATE OR ALTER TRIGGER trg_PlatnoscComplexControl
 ON dbo.platnosci
 INSTEAD OF INSERT
@@ -288,14 +218,7 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [8] AFTER INSERT, UPDATE na rezerwacje
---     Cel: gdy rezerwacja zostaje potwierdzona, status pojazdu
---     automatycznie zmienia sie na 'zarezerwowany', dzieki
---     czemu pojazd nie moze zostac wypozyczony przez innego
---     pracownika. TRIGGER_NESTLEVEL() chroni przed rekurencja
---     gdyby zmiana statusu pojazdu wywolala inny trigger.
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_rezerwacja_status_pojazdu
 ON dbo.rezerwacje
 AFTER INSERT, UPDATE
@@ -305,14 +228,12 @@ BEGIN
     IF TRIGGER_NESTLEVEL() > 1 RETURN;
     SET NOCOUNT ON;
 
-    -- Pojazd zarezerwowany gdy rezerwacja jest potwierdzona
     UPDATE p
     SET    p.[status] = 'zarezerwowany'
     FROM   dbo.pojazdy p
     JOIN   inserted i ON p.pojazd_id = i.pojazd_id
     WHERE  i.[status] = 'potwierdzona';
 
-    -- Pojazd dostepny gdy rezerwacja zostala anulowana
     UPDATE p
     SET    p.[status] = 'dostepny'
     FROM   dbo.pojazdy p
@@ -322,13 +243,7 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [9] AFTER DELETE na pojazdy  (NOWY)
---     Cel: przed fizycznym usunieciem pojazdu z systemu jego
---     podstawowe dane trafiaja do tabeli archiwalnej. Dzieki
---     temu mozliwe jest pozniejsze odtworzenie historii floty
---     lub wyjasnienien ewentualnych roszczen prawnych.
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_Pojazdy_Archive_Delete
 ON dbo.pojazdy
 AFTER DELETE
@@ -343,13 +258,7 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [10] AFTER DELETE na klienci  (NOWY)
---      Cel: analogicznie do pojazdu - usuniecie klienta
---      (np. na jego zadanie, RODO) archiwizuje minimalne dane
---      potrzebne do weryfikacji historii wypozyczeń. PESEL
---      pozwala powiazac archive z ewentualnymi roszczeniami.
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_Klienci_Archive_Delete
 ON dbo.klienci
 AFTER DELETE
@@ -364,15 +273,7 @@ BEGIN
 END;
 GO
 
--- ------------------------------------------------------------
--- [11] AFTER UPDATE na wypozyczenia  (NOWY - brakujacy)
---      Cel: gdy pracownik wpisuje date rzeczywistego zwrotu
---      (dataRzeczywistegoZwrotu), pojazd automatycznie zmienia
---      status z 'wypozyczony' na 'dostepny'. Bez tego triggera
---      pracownik musialby pamietac o recznej zmianie statusu,
---      co w praktyce prowadzi do bledow (pojazd zablokowany
---      w systemie mimo ze stoi na parkingu).
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_Wypozyczenie_Zwrot_StatusPojazdu
 ON dbo.wypozyczenia
 AFTER UPDATE
@@ -382,26 +283,18 @@ BEGIN
     IF TRIGGER_NESTLEVEL() > 1 RETURN;
     SET NOCOUNT ON;
 
-    -- Jezeli dataRzeczywistegoZwrotu zostala wlasnie wypelniona
-    -- (wczesniej NULL, teraz NOT NULL) - oznacza to zwrot auta
     UPDATE p
     SET    p.[status] = 'dostepny'
     FROM   dbo.pojazdy p
     JOIN   inserted i ON p.pojazd_id = i.pojazd_id
-    JOIN   deleted  d ON d.pojazd_id = i.pojazd_id -- poprzedni stan
+    JOIN   deleted  d ON d.pojazd_id = i.pojazd_id 
     WHERE  d.dataRzeczywistegoZwrotu IS NULL
       AND  i.dataRzeczywistegoZwrotu IS NOT NULL
       AND  p.[status] = 'wypozyczony';
 END;
 GO
 
--- ------------------------------------------------------------
--- [12] DDL TRIGGER na bazie danych  (DATABASE scope)
---      Cel: loguje kazda operacje DROP TABLE wykonana w bazie.
---      W srodowisku produkcyjnym pozwala wykryc przypadkowe
---      lub zlosliwe usuniecie tabeli i zidentyfikowac sprawce.
---      EVENTDATA() zwraca XML z pelnym kontekstem zdarzenia.
--- ------------------------------------------------------------
+
 CREATE OR ALTER TRIGGER trg_DDL_DropTable_Audit
 ON DATABASE
 AFTER DROP_TABLE
@@ -418,25 +311,21 @@ BEGIN
 END;
 GO
 
--- ============================================================
+
 -- CZESC 3: TESTY
--- ============================================================
 PRINT '=== TESTY TRIGGEROW ===';
 GO
 
--- [1] Test trg_KlientDaneAudit - zmiana nazwiska klienta
 PRINT '--- Test 1: Audyt zmiany danych klienta ---';
 UPDATE dbo.klienci SET nazwisko = 'Testowy' WHERE klient_id = 1;
 SELECT * FROM dbo.KlientAudit WHERE KlientID = 1;
 GO
 
--- [2] Test trg_PracownikAudit - zmiana stanowiska pracownika
 PRINT '--- Test 2: Audyt zmiany danych pracownika ---';
 UPDATE dbo.pracownicy SET stanowisko = 'Kierownik' WHERE pracownik_id = 1;
 SELECT * FROM dbo.PracownicyAudit WHERE PracownikID = 1;
 GO
 
--- [3] Test trg_PojazdPrzebiegKorekta - proba cofniecia licznika
 PRINT '--- Test 3: Ochrona przed cofnieciem przebiegu ---';
 DECLARE @stary_przebieg BIGINT;
 SELECT @stary_przebieg = przebieg FROM pojazdy WHERE pojazd_id = 1;
@@ -445,13 +334,11 @@ UPDATE dbo.pojazdy SET przebieg = 0 WHERE pojazd_id = 1;
 SELECT pojazd_id, przebieg AS 'Przebieg po (powinien byc niezmieniony)' FROM pojazdy WHERE pojazd_id = 1;
 GO
 
--- [4] Test trg_loguj_zmiane_ceny - zmiana ceny za dobe
 PRINT '--- Test 4: Historia zmian ceny ---';
 UPDATE dbo.pojazdy SET cenaZaDzien = cenaZaDzien + 10 WHERE pojazd_id = 1;
 SELECT * FROM dbo.historia_cen_pojazdow WHERE pojazd_id = 1;
 GO
 
--- [5] Test trg_BlockVINChange - proba zmiany numeru VIN
 PRINT '--- Test 5: Blokada zmiany VIN (oczekiwany blad) ---';
 BEGIN TRY
     UPDATE dbo.pojazdy SET nrVIN = N'00000000000000000' WHERE pojazd_id = 1;
@@ -461,7 +348,6 @@ BEGIN CATCH
 END CATCH;
 GO
 
--- [6] Test trg_PojazdInsertValidation - pojazd sprzed 2000 roku
 PRINT '--- Test 6: Blokada dodania starego pojazdu (oczekiwany blad) ---';
 BEGIN TRY
     INSERT INTO dbo.pojazdy (nrRejestr, nrVIN, marka, model, rokProdukcji, cenaZaDzien)
@@ -472,7 +358,6 @@ BEGIN CATCH
 END CATCH;
 GO
 
--- [7] Test trg_PlatnoscComplexControl - platnosc z ujemna kwota
 PRINT '--- Test 7: Blokada ujemnej platnosci (oczekiwany blad) ---';
 BEGIN TRY
     INSERT INTO dbo.platnosci (kwota, metodaPlatnosci, wypozyczenie_id)
@@ -483,7 +368,6 @@ BEGIN CATCH
 END CATCH;
 GO
 
--- [8] Test trg_rezerwacja_status_pojazdu - potwierdzenie rezerwacji
 PRINT '--- Test 8: Automatyczna zmiana statusu pojazdu po potwierdzeniu rezerwacji ---';
 UPDATE dbo.rezerwacje SET [status] = 'potwierdzona' WHERE rezerwacja_id = 1;
 SELECT p.pojazd_id, p.[status] AS 'Status pojazdu (oczekiwany: zarezerwowany)'
@@ -492,23 +376,22 @@ JOIN rezerwacje r ON p.pojazd_id = r.pojazd_id
 WHERE r.rezerwacja_id = 1;
 GO
 
--- [9] Test trg_Wypozyczenie_Zwrot_StatusPojazdu - zwrot pojazdu
 PRINT '--- Test 9: Automatyczny status dostepny po zwrocie ---';
--- Znajdz aktywne wypozyczenie bez daty zwrotu
+
 DECLARE @wid INT, @pid INT;
 SELECT TOP 1 @wid = wypozyczenie_id, @pid = pojazd_id
 FROM wypozyczenia WHERE dataRzeczywistegoZwrotu IS NULL;
--- Najpierw ustaw pojazd jako wypozyczony
+
 UPDATE pojazdy SET [status] = 'wypozyczony' WHERE pojazd_id = @pid;
--- Teraz wpisz date zwrotu
+
 UPDATE wypozyczenia SET dataRzeczywistegoZwrotu = GETDATE() WHERE wypozyczenie_id = @wid;
 SELECT pojazd_id, [status] AS 'Status (oczekiwany: dostepny)'
 FROM pojazdy WHERE pojazd_id = @pid;
 GO
 
--- [10] Test trg_Pojazdy_Archive_Delete / trg_Klienci_Archive_Delete
+
 PRINT '--- Test 10: Archiwizacja usunietych rekordow ---';
--- Wstawiamy tymczasowy pojazd i klienta, potem usuwamy
+
 INSERT INTO dbo.pojazdy(nrRejestr,nrVIN,marka,model,rokProdukcji,cenaZaDzien)
 VALUES('DEL0001',N'DELVIN00000000001','Test','Delete',2020,99.00);
 
