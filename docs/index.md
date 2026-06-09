@@ -13,6 +13,8 @@ Projekt bazy danych dla systemu wypożyczalni samochodów, zrealizowany w ramach
 ## Spis treści
 
 - [Opis projektu](#opis-projektu)
+- [Pełna instalacja jednym skryptem](#pełna-instalacja-jednym-skryptem)
+- [Diagram architektury systemu](#diagram-architektury-systemu)
 - [Diagram ERD](#diagram-erd)
 - [Diagram przypadków użycia](#diagram-przypadków-użycia)
 - [Szczegółowy opis tabel](#szczegółowy-opis-tabel)
@@ -47,6 +49,27 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 | `uszkodzenia` | Zgłoszone uszkodzenia pojazdów |
 | `premiePracownikow` | Historia premii pracowniczych |
 | `Ubezpieczenie_wypozyczenia` | Polisy ubezpieczeniowe do wypożyczeń |
+
+---
+
+## Pełna instalacja jednym skryptem
+
+Plik: [`PELNA_BAZA.sql`](../01_struktura/Pelna_baza.sql)
+
+Skrypt łączący w jednym pliku wszystkie elementy projektu opisane szczegółowo w dalszej części dokumentacji — strukturę bazy, funkcje, widoki, triggery oraz wygenerowane dane testowe. Wystarczy otworzyć go w SSMS i nacisnąć **F5**, aby otrzymać w pełni działającą bazę danych.
+
+> ⚠️ Skrypt usuwa bazę danych jeśli już istnieje i tworzy ją od nowa.
+
+---
+
+## Diagram architektury systemu
+
+Plik do dodania przez Tymona Korpielę.
+
+<!-- Wklej link do diagramu tutaj: -->
+<!-- ![Architecture Overview](images/NAZWA_PLIKU.png) -->
+
+> 📌 *Architecture Overview Diagram zostanie tutaj umieszczony*
 
 ---
 
