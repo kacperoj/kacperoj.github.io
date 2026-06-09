@@ -54,7 +54,8 @@ System obsługuje pełen cykl życia wypożyczenia samochodu — od rejestracji 
 
 ## Pełna instalacja jednym skryptem
 
-Plik: [`PELNA_BAZA.sql`](../01_struktura/Pelna_baza.sql)
+Plik: [`PELNA_BAZA.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/01_struktura/Pelna_baza.sql)
+
 
 Skrypt łączący w jednym pliku wszystkie elementy projektu opisane szczegółowo w dalszej części dokumentacji — strukturę bazy, funkcje, widoki, triggery oraz wygenerowane dane testowe. Wystarczy otworzyć go w SSMS i nacisnąć **F5**, aby otrzymać w pełni działającą bazę danych.
 
@@ -117,7 +118,7 @@ Funkcje
 
 ## Struktura bazy danych
 
-Plik: [`01_struktura/Create_bazy.sql`](../01_struktura/Create_bazdy.sql)
+Plik: [`01_struktura/Create_bazy.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/01_struktura/Create_bazdy.sql)
 
 Skrypt tworzy bazę danych `ProjektWypozyczalnia2` oraz wszystkie tabele z:
 - kluczami głównymi (`IDENTITY`) i obcymi (`FOREIGN KEY`)
@@ -128,7 +129,7 @@ Skrypt tworzy bazę danych `ProjektWypozyczalnia2` oraz wszystkie tabele z:
 
 ## Generowanie danych
 
-Pliki: [`02_dane/Generuj_dane_Projektu_FINAL.sql`](../02_dane/Generuj_dane_Projektu_FINAL.sql) · [`02_dane/CzyszczenieBazy.sql`](../02_dane/CzyszczenieBazy.sql)
+Pliki: [`02_dane/Generuj_dane_Projektu_FINAL.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/02_dane/Generuj_dane_Projektu_FINAL.sql) · [`02_dane/CzyszczenieBazy.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/02_dane/CzyszczenieBazy.sql)
 
 Jeden skrypt generuje dane do wszystkich tabel w kolejności zgodnej z kluczami obcymi:
 
@@ -150,7 +151,7 @@ Skrypt `CzyszczenieBazy.sql` usuwa wszystkie rekordy i resetuje liczniki `IDENTI
 
 ## Triggery
 
-Plik: [`03_obiekty_bazy_danych/Triggery.sql`](../03_obiekty_bazy_danych/Triggery.sql)
+Plik: [`03_obiekty_bazy_danych/Triggery.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/03_obiekty_bazy_danych/Triggery.sql)
 
 Zaimplementowano 12 triggerów w 4 kategoriach:
 
@@ -194,7 +195,7 @@ Zaimplementowano 12 triggerów w 4 kategoriach:
 ---
 ### Widoki
 
-Plik: [`03_obiekty_bazy_danych/widoki.sql`](../03_obiekty_bazy_danych/widoki.sql)
+Plik: [`03_obiekty_bazy_danych/widoki.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/03_obiekty_bazy_danych/widoki.sql)
 
 Zaimplementowano 8 widoków zapewniających gotowe perspektywy analityczne i operacyjne:
 
@@ -213,7 +214,7 @@ Zaimplementowano 8 widoków zapewniających gotowe perspektywy analityczne i ope
 
 ### Funkcje
 
-Plik: [`03_obiekty_bazy_danych/Funkcje.sql`](../03_obiekty_bazy_danych/Funkcje.sql)
+Plik: [`03_obiekty_bazy_danych/Funkcje.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/03_obiekty_bazy_danych/Funkcje.sql)
 
 Zaimplementowano 6 funkcji użytkownika — 1 tabelaryczną (TVF) i 5 skalarnych:
 
@@ -254,7 +255,7 @@ SELECT dbo.ObliczKareZaSpoznienie('2024-01-10', '2024-01-13', 50.00);
 
 ## Transakcje
 
-Plik: [`04_zapytania/tranzakcje.sql`](../04_zapytania/tranzakcje.sql)
+Plik: [`04_zapytania/tranzakcje.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/04_zapytania/tranzakcje.sql)
 
 Zaimplementowano kilka scenariuszy transakcyjnych demonstrujących mechanizmy kontroli spójności danych:
 
@@ -284,7 +285,7 @@ EXEC dbo.DodajPojazdTestowy @akcja = 'ROLLBACK'; -- wycofuje
 
 ## Zapytania zaawansowane
 
-Plik: [`04_zapytania/ZaawansowaneZapytania.sql`](../04_zapytania/ZaawansowaneZapytania.sql)
+Plik: [`04_zapytania/ZaawansowaneZapytania.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/04_zapytania/ZaawansowaneZapytania.sql)
 
 15 zapytań w 3 kategoriach:
 
@@ -311,7 +312,7 @@ Plik: [`04_zapytania/ZaawansowaneZapytania.sql`](../04_zapytania/ZaawansowaneZap
 
 ## Funkcje okna
 
-Plik: [`04_zapytania/FunkcjeOkna.sql`](../04_zapytania/FunkcjeOkna.sql)
+Plik: [`04_zapytania/FunkcjeOkna.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/04_zapytania/FunkcjeOkna.sql)
 
 14 zapytań w 4 kategoriach:
 
@@ -339,7 +340,7 @@ Plik: [`04_zapytania/FunkcjeOkna.sql`](../04_zapytania/FunkcjeOkna.sql)
 
 ## Raportowanie XML i JSON
 
-Plik: [`04_zapytania/RaportyXML_JSON.sql`](../04_zapytania/RaportyXML_JSON.sql)
+Plik: [`04_zapytania/RaportyXML_JSON.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/04_zapytania/RaportyXML_JSON.sql)
 
 ### Raporty XML
 
