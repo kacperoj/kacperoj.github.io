@@ -120,7 +120,7 @@ Funkcje
 
 Plik: [`01_struktura/Create_bazy.sql`](https://github.com/kacperoj/kacperoj.github.io/blob/main/01_struktura/Create_bazdy.sql)
 
-Skrypt tworzy bazę danych `ProjektWypozyczalnia2` oraz wszystkie tabele z:
+Skrypt tworzy bazę danych `ProjektWypozyczalnia` oraz wszystkie tabele z:
 - kluczami głównymi (`IDENTITY`) i obcymi (`FOREIGN KEY`)
 - ograniczeniami `CHECK` na statusy pojazdów, rezerwacji i metody płatności
 - wartościami domyślnymi (`DEFAULT GETDATE()`, `DEFAULT 'dostepny'`)
